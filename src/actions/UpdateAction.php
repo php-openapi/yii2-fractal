@@ -66,6 +66,26 @@ class UpdateAction extends JsonApiAction
      *  ```
      */
     public $scenario = Model::SCENARIO_DEFAULT;
+
+    /**
+     * @var callable|null A PHP callable that will be called to determine
+     * whether the update of a model is allowed. If not set, no update
+     * check will be performed. The callable should have the following signature:
+     *
+     * @example
+     * ```php
+     * function ($action, $model) {
+     *     // $model is the model instance being updated.
+     *
+     *     // If the update is not allowed, an error should be thrown. For example:
+     *     if ($model->status === 'archived') {
+     *         throw new MethodNotAllowedHttpException('The model cannot be updated when its status is "archived".');
+     *     }
+     * }
+     * ```
+     */
+    public $checkUpdateAllowed;
+
     /**
      * @var callable|Closure Callback after save model with all relations
      * @example
@@ -74,6 +94,7 @@ class UpdateAction extends JsonApiAction
      * }
      */
     public $afterSave = null;
+
     /**
      * @throws \yii\base\InvalidConfigException
      */
@@ -111,6 +132,10 @@ class UpdateAction extends JsonApiAction
 
         if ($this->checkAccess) {
             call_user_func($this->checkAccess, $this->id, $model);
+        }
+
+        if ($this->checkUpdateAllowed) {
+            call_user_func($this->checkUpdateAllowed, $this->id, $model);
         }
 
         $originalModel = clone $model;

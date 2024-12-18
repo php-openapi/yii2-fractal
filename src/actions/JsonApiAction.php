@@ -61,13 +61,20 @@ class JsonApiAction extends Action
     public $findModel;
 
     /**
-     * @var callable a PHP callable that will be called when running an action to determine
-     * if the current user has the permission to execute the action. If not set, the access
-     * check will not be performed. The signature of the callable should be as follows,
+     * @var callable|null A PHP callable that will be called when running an action to determine
+     * whether the current user has permission to execute the action. If not set, no access
+     * check will be performed. The callable should have the following signature:
+     *
+     * @example
      * ```php
      * function ($action, $model = null) {
      *     // $model is the requested model instance.
-     *     // If null, it means no specific model (e.g. IndexAction)
+     *     // If null, it indicates no specific model (e.g., IndexAction).
+     *
+     *     // If the user does not have the required permissions, an error should be thrown. For example:
+     *     if (!Yii::$app->user->can('admin')) {
+     *         throw new ForbiddenHttpException();
+     *     }
      * }
      * ```
      */

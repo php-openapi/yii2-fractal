@@ -38,6 +38,26 @@ class DeleteAction extends JsonApiAction
     public $scenario = Model::SCENARIO_DEFAULT;
 
     /**
+     * @var callable|null A PHP callable that will be called to determine
+     * whether the deletion of a model is allowed. If not set, no deletion
+     * check will be performed. The callable should have the following signature:
+     *
+     * @example
+     * ```php
+     * function ($action, $model) {
+     *     // $model is the model instance being deleted.
+     *
+     *     // If the deletion is not allowed, an error should be thrown. For example:
+     *     if ($model->status !== 'draft') {
+     *         throw new MethodNotAllowedHttpException('The model can only be deleted if its status is "draft".');
+     *     }
+     * }
+     * ```
+     */
+    public $checkDeleteAllowed;
+
+
+    /**
      * @var callable|Closure Callback after save model with all relations
      * @example
      *   'afterDelete' => function ($model) {
@@ -78,6 +98,10 @@ class DeleteAction extends JsonApiAction
 
         if ($this->checkAccess) {
             call_user_func($this->checkAccess, $this->id, $model);
+        }
+
+        if ($this->checkDeleteAllowed) {
+            call_user_func($this->checkDeleteAllowed, $this->id, $model);
         }
 
         if ($model->delete() === false) {
