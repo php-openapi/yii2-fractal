@@ -20,6 +20,7 @@
 		"cebe/indent": "*",
 		"friendsofphp/php-cs-fixer": "~2.16",
 		"codeception/codeception": "5.1.*",
+		"behat/gherkin": "<4.11",
 		"codeception/module-yii2": "^1.1",
 		"codeception/module-rest": "^3.0",
 		"codeception/module-phpbrowser": "3.0.*",

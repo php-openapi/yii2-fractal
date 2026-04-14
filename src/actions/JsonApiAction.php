@@ -161,14 +161,17 @@ class JsonApiAction extends Action
         /* @var $modelClass ActiveRecordInterface */
         $modelClass = $this->modelClass;
         $keys = $modelClass::primaryKey();
-        if (count($keys) > 1) {
-            $values = explode(',', $id);
-            if (count($keys) === count($values)) {
-                $condition = array_combine($keys, $values);
+
+        if ($id !== null) {
+            if (count($keys) > 1) {
+                $values = explode(',', $id);
+                if (count($keys) === count($values)) {
+                    $condition = array_combine($keys, $values);
+                }
+            } else {
+                $idKey = reset($keys);
+                $condition = [$this->modelTable().'.'.$idKey => $id];
             }
-        } elseif ($id !== null) {
-            $idKey = reset($keys);
-            $condition = [$this->modelTable().'.'.$idKey => $id];
         }
 
         return $condition ?? [];
